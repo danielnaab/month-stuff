@@ -1,0 +1,24 @@
+#search {
+    width: 370px;
+    display: inline-block;
+    &.disabled  * {
+        opacity: 0.8;
+    }
+    .autocomplete {
+        margin-bottom: 1em;
+    }
+    ul {
+        padding: 10px;
+        &.pagination {
+            text-align: center;
+            li {
+                display: inline;
+                padding: 10px 5px;
+                margin: 5px;
+                span {
+                    color: green;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+@import "include/reset";
+
+@import "components/autocomplete";
+@import "components/products";
+@import "components/club";
+@import "components/search";
+
+
+body {
+    font-family: arial, sans-serif;
+    padding: 10px;
+    min-width: 960px;
+}
+
+
+a {
+    text-color: green;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
+header#header {
+    h1 {
+        font-size: 150%;
+    }
+    h2 {
+        font-size: 120%;
+    }
+    ul {
+        padding: 5px;
+        li {
+            display: inline;
+            margin: 5px;
+        }
+    }
+}

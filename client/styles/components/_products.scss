@@ -1,0 +1,40 @@
+ul.products {
+    padding: 10px;
+    h1 {
+        font-size: 120%;
+    }
+    li {
+        overflow: hidden;
+        border: solid 1px lightgray;
+        padding: 5px;
+        position: relative;
+        a {
+            display: block;
+        }
+        a.add {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            padding: 5px;
+        }
+        .asin {
+            margin-left: 5px;
+            font-size: 60%;
+            &:before {
+                content: '('
+            }
+            &:after {
+                content: ')'
+            }
+        }
+        img {
+            float: left;
+            padding: 5px;
+        }
+        .date {
+            .month {
+                font-size: 150%;
+            }
+        }
+    }
+}

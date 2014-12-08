@@ -1,0 +1,37 @@
+.autocomplete {
+    text-align: left;
+    position: relative;
+    input {
+        width: 100%;
+        font-size: 120%;
+    }
+    ul {
+        z-index: 1;
+        position: absolute;
+        width: 100%;
+        font-size: 110%;
+        background-color: white;
+        list-style: none;
+        border: solid 1px lightgray;
+        li {
+            padding: 0 10px;
+            line-height: 1.5em;
+            .asin {
+                margin-left: 5px;
+                font-size: 60%;
+                &:before {
+                    content: '('
+                }
+                &:after {
+                    content: '}'
+                }
+            }
+            &.selected, &:hover {
+                background-color: lightgray;
+            }
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
