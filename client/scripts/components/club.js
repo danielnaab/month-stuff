@@ -7,11 +7,14 @@ var h = hg.h
 var DragList = require('./drag-list.js')
 var Product = require('./product.js')
 
-var api = require('../api.js')
-
 
 function Club(initial) {
     initial = initial || {}
+
+    if (typeof initial.startDate === 'string') {
+        initial.startDate = new Date(initial.startDate)
+    }
+
     return hg.state({
         description: hg.value(initial.description || 'My Month Club'),
         products: hg.array(initial.products || []),
@@ -35,15 +38,27 @@ function Club(initial) {
 }
 
 
-function getDateOffset(date, monthOffset) {
+Club.getDateOffset = function (date, monthOffset) {
     var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
     newDate.setMonth(newDate.getMonth() + monthOffset)
     return newDate
 }
 
 
-Club.render = function render(state) {
+Club.getPermalink = function (state) {
+    return ('#club/' + state.description +
+            '/' + state.products.map(function (product) {
+                return product.asin
+            }).join(',') +
+            state.startDate)
+}
+
+
+Club.render = function render(state, showPermalink) {
     return h('#club', [
+        h('a.permalink', {
+            href: Club.getPermalink(state)
+        }, 'Permalink'),
         h('input', {
             id: 'club-title',
             type: 'text',
@@ -64,10 +79,10 @@ Club.render = function render(state) {
                          hg.submitEvent(state.handles.blurDate)]
         }),
         DragList.render(state.products, 'products', function (product, index) {
-            return Product.render(product, getDateOffset(state.startDate, index))
+            return Product.render(product,
+                                  Club.getDateOffset(state.startDate, index))
         })
     ])
 }
-
 
 module.exports = Club

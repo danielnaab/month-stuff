@@ -24,7 +24,7 @@ function ClubBuild(initial) {
 ClubBuild.render = function render(state) {
     return h('.club-build', [
         Search.render(state.search),
-        Club.render(state.club)
+        Club.render(state.club, true)
     ])
 }
 

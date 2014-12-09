@@ -44,16 +44,18 @@ function Router() {
 }
 
 
-var cachedRouter = Router()
+var cachedRouter = null
 
 function getRouter() {
+    if (!cachedRouter) {
+        cachedRouter = Router()
+    }
     return cachedRouter
 }
 
 getRouter.atom = cachedRouter
 getRouter.anchor = require('./anchor.js')
 getRouter.render = require('./view.js')
-
 
 
 module.exports = getRouter

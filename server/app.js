@@ -24,7 +24,7 @@ var ADD_CLUB_SCHEMA = {
 var DEBUG = false
 
 
-app.get('/search', function (req, res) {
+app.get('/api/search', function (req, res) {
     // If debugging locally, allow cross-domain requests (server is hosted on
     // different port than client assets).
     if (DEBUG) {
@@ -119,7 +119,7 @@ app.get('/search', function (req, res) {
 })
 
 
-app.get('/club/:clubId', function (req, res) {
+app.get('/api/club/:clubId', function (req, res) {
     // If debugging locally, allow cross-domain requests (server is hosted on
     // different port than client assets).
     if (DEBUG) {
@@ -142,7 +142,7 @@ app.get('/club/:clubId', function (req, res) {
 })
 
 
-app.post('/club', function (req, res) {
+app.post('/api/club', function (req, res) {
     // If debugging locally, allow cross-domain requests (server is hosted on
     // different port than client assets).
     if (DEBUG) {
@@ -175,6 +175,41 @@ app.post('/club', function (req, res) {
         }))
     })
 })
+
+
+/*
+ * Attempt at server rendering. The general idea works, but observ is behaving
+ * differently on node than in-browser, causing some issues.
+ */
+var h = require('mercury').h
+var stringify = require('virtual-dom-stringify')
+var ClientApp = require('../client/scripts/app.js')
+app.get('/build-club', function (req, res) {
+    var state = ClientApp({
+        route: 'build-club'
+    })()
+
+    var vtree = h('html', {lang: 'en'}, [
+        h('head', [
+            h('meta', {charset: 'utf-8'}),
+            h('title', 'Month Stuff')
+        ]),
+        h('body', [
+            h('link', {
+                href: 'http://localhost:9000/styles/app.css',
+                rel: 'stylesheet',
+                media: 'screen'
+            }),
+            h('#app', ClientApp.render(state)),
+            h('script', 'var initialState = ' + JSON.stringify(state)),
+            h('script', {src: 'http://localhost:9000/scripts/main.js'})
+        ])
+    ])
+
+    res.setHeader('Content-Type', 'text/html')
+    res.end('<!DOCTYPE html>' + stringify(vtree))
+})
+
 
 function createServer(port, debug) {
     DEBUG = debug
