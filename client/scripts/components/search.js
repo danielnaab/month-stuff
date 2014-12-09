@@ -22,19 +22,19 @@ function doSearch(state) {
 }
 
 
-function Search(opts, selectProductCallback) {
-    opts = opts || {}
+function Search(initial, selectProductCallback) {
+    initial = initial || {}
 
     function submit(keywords) {
         doSearch(state)
     }
 
     var state = hg.state({
-        products: hg.array([]),
-        keywords: AutoCompleteInput(opts.keywords, api.autocomplete, submit),
-        page: hg.value(opts.page || 1),
+        products: hg.array(initial.products || []),
+        keywords: AutoCompleteInput(initial.keywords, api.autocomplete, submit),
+        page: hg.value(initial.page || 1),
         totalPages: hg.value(0),
-        condition: hg.value(opts.condition || 'New'),
+        condition: hg.value(initial.condition || 'New'),
         searching: hg.value(false),
         handles: {
             doSearch: doSearch,

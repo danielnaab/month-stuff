@@ -3,15 +3,15 @@
 var hg = require('mercury')
 var h = hg.h
 
-var ESCAPE = 27
+/*var ESCAPE = 27
 var UP = 39
-var DOWN = 40
+var DOWN = 40*/
 
 
 function AutoCompleteInput(initial, getChoices, submitCallback) {
-    initial = initial || ''
+    initial = initial || {}
     return hg.state({
-        text: hg.value(initial),
+        text: hg.value(initial.text || ''),
         choices: hg.array([]),
         editing: hg.value(false),
         enabled: hg.value(true),

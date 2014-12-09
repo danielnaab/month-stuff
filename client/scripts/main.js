@@ -9,7 +9,7 @@ var App = require('./app.js'),
     rafListen = require('./lib/raf-listen.js')
 
 
-var CLUB_STATE_KEY = 'monthstuff-build-club@' + config.STATE_VERSION
+var STATE_KEY = 'monthstuff@' + config.STATE_VERSION
 
 
 /**
@@ -20,10 +20,12 @@ var CLUB_STATE_KEY = 'monthstuff-build-club@' + config.STATE_VERSION
 function getInitialState() {
     var initialState = window.initialState || {}
 
+    // Reuse a limited subset of the previous application state.
     if (window.localStorage !== undefined) {
-        var initialClub = window.localStorage.getItem(CLUB_STATE_KEY)
-        if (initialClub) {
-            initialState.club = JSON.parse(initialClub)
+        var localState = window.localStorage.getItem(STATE_KEY)
+        if (localState) {
+            localState = JSON.parse(localState)
+            initialState.clubBuild = localState.clubBuild
         }
     }
 
@@ -35,7 +37,7 @@ function createApp() {
     var app = App(getInitialState())
 
     rafListen(app, function onChange(value) {
-        window.localStorage.setItem('CLUB_STATE_KEY', JSON.stringify(value.club))
+        window.localStorage.setItem(STATE_KEY, JSON.stringify(value))
     })
 
     return app
