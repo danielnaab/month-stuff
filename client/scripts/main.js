@@ -2,7 +2,6 @@
 
 var hg = require('mercury'),
     document = require('global/document'),
-    extend = require('xtend'),
     window = require('global/window')
 
 var App = require('./app.js'),
@@ -43,25 +42,6 @@ function createApp() {
 }
 
 
-// Version of mercury.app that uses `replaceChild` instead of `appendChild` if
-// a server-render node is already in the document.
-function app(elem, observ, render, opts) {
-    hg.Delegator(opts);
-    var loop = hg.main(observ(), render, extend({
-        diff: hg.diff,
-        create: hg.create,
-        patch: hg.patch
-    }, opts));
-    if (elem) {
-        if (elem.hasChildNodes()) {
-            elem.parentNode.replaceChild(loop.target, elem)
-        }
-        else {
-            elem.appendChild(loop.target);
-        }
-    }
-    return observ(loop.update);
-}
-
-
-app(document.getElementById('app'), createApp(), App.render)
+var elem = document.getElementById('app')
+elem.innerHTML = ''
+hg.app(elem, createApp(), App.render)

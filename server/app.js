@@ -25,12 +25,6 @@ var DEBUG = false
 
 
 app.get('/api/search', function (req, res) {
-    // If debugging locally, allow cross-domain requests (server is hosted on
-    // different port than client assets).
-    if (DEBUG) {
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
-    }
-
     // Validate query parameters.
     var info = Joi.validate(req.query, SEARCH_SCHEMA)
     if (info.error) {
@@ -120,12 +114,6 @@ app.get('/api/search', function (req, res) {
 
 
 app.get('/api/club/:clubId', function (req, res) {
-    // If debugging locally, allow cross-domain requests (server is hosted on
-    // different port than client assets).
-    if (DEBUG) {
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
-    }
-
     db.getClub(req.params.clubId, function (club) {
         if (!club) {
             res.status(404).end('Club not found')
@@ -143,12 +131,6 @@ app.get('/api/club/:clubId', function (req, res) {
 
 
 app.post('/api/club', function (req, res) {
-    // If debugging locally, allow cross-domain requests (server is hosted on
-    // different port than client assets).
-    if (DEBUG) {
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
-    }
-
     // Validate query parameters.
     var info = Joi.validate(req.query, ADD_CLUB_SCHEMA)
     if (info.error) {
