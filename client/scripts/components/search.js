@@ -90,7 +90,7 @@ Search.render = function (state) {
                 Product.render(product),
                 h('a.add', {
                     'ev-click': hg.clickEvent(state.handles.selectProduct, product)
-                }, 'Add to my club')
+                }, 'Add to my stuff')
             ])
         })),
         pagination

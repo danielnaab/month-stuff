@@ -43,6 +43,7 @@ function AutoCompleteInput(initial, getChoices, submitCallback) {
     })
 }
 
+
 AutoCompleteInput.setEnabled = function (state, enabled) {
     state.enabled.set(enabled)
 }

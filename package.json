@@ -32,8 +32,10 @@
   },
   "dependencies": {
     "apac": "^1.0.0",
+    "async": "^0.9.0",
     "aws-sdk": "^2.0.29",
     "browser-locale": "^1.0.0",
+    "chunk": "0.0.2",
     "express": "^4.10.4",
     "fancy-select": "^2.0.0",
     "geval": "^2.1.1",

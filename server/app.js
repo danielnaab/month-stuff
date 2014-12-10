@@ -1,19 +1,15 @@
 'use strict';
 
-var Amazon = require('apac').OperationHelper,
-    app = require('express')(),
-    Joi = require('Joi')
+var app = require('express')(),
+    h = require('mercury').h,
+    Joi = require('Joi'),
+    stringify = require('virtual-dom-stringify')
 
-var config = require('./config')
-var db = require('./db')
+var ClientApp = require('../client/scripts/app.js'),
+    amazon = require('./amazon.js'),
+    db = require('./db')
 
 
-// Globals
-var AMAZON = new Amazon({
-    awsId: config.amazon.awsId,
-    awsSecret: config.amazon.awsSecret,
-    assocId: config.amazon.assocId
-})
 var SEARCH_SCHEMA = {
     keywords: Joi.string().required(),
     page: Joi.number().integer().default(1)
@@ -40,63 +36,19 @@ app.get('/api/search', function (req, res) {
 
     // Query Amazon's `ItemSearch` API.
     var options = {
-        // Global options:
-        ResponseGroup: 'ItemAttributes,OfferSummary,Images',
-        Condition: 'New',
-        // User options:
         ItemPage: params.page,
-        SearchIndex: 'All',
         Keywords: params.keywords
     }
-    AMAZON.execute('ItemSearch', options, function(err, results) {
+    amazon.itemSearch(options, function (err, products, totalPages) {
         if (err) {
             res.end(JSON.stringify({
                 status: {
                     success: false,
-                    info: 'There was an error searching Amazon Products.'
+                    info: err
                 }
             }))
             return
         }
-
-        var items = results.ItemSearchResponse.Items[0].Item
-        if (items === undefined) {
-            res.end(JSON.stringify({
-                status: {
-                    success: false,
-                    info: 'We are sad'
-                }
-            }))
-            return
-        }
-
-        var products = items.map(function (item) {
-            var summary = item.OfferSummary ? (
-                item.OfferSummary[0].LowestNewPrice ||
-                item.OfferSummary[0].LowestUsedPrice) : null
-            return {
-                ASIN: item.ASIN[0],
-                url: item.DetailPageURL[0],
-                brand: (item.ItemAttributes[0].Brand !== undefined ?
-                        item.ItemAttributes[0].Brand[0] : null),
-                title: (item.ItemAttributes[0].Title !== undefined ?
-                        item.ItemAttributes[0].Title[0] : null),
-                feature: (item.ItemAttributes[0].Feature !== undefined ?
-                          item.ItemAttributes[0].Feature[0] : null),
-                // Available images: SmallImage, MediumImage, LargeImage
-                image: item.SmallImage ? {
-                    url: item.SmallImage[0].URL[0],
-                    width: item.SmallImage[0].Width[0]._,
-                    height: item.SmallImage[0].Height[0]._
-                } : null,
-                manufacturer: item.Manufacturer,
-                quantity: item.NumberOfItems,
-                price: (summary && summary[0].FormattedPrice ?
-                            summary[0].FormattedPrice[0] :
-                            'Price Unknown')
-            }
-        })
-
         res.end(JSON.stringify({
             status: {
                 success: true
@@ -105,9 +57,32 @@ app.get('/api/search', function (req, res) {
             page: params.page,
             // The API will only allow retreiving a maximum of 10 pages.
             // If the "All" SearchIndex is used, it will only return 5 pages.
-            numPages: Math.min(
-                options.SearchIndex === 'All' ? 5 : 10,
-                parseInt(results.ItemSearchResponse.Items[0].TotalPages))
+            numPages: totalPages
+        }))
+    })
+})
+
+
+app.get('/api/products/:ASINs', function (req, res) {
+    // B00008OE6I,B35987036I,B0002546I
+
+    // Query Amazon's `ItemSearch` API.
+    var ASINs = req.params.ASINs.split(',')
+    amazon.getItems(ASINs, function (err, products, totalPages) {
+        if (err) {
+            res.end(JSON.stringify({
+                status: {
+                    success: false,
+                    info: err
+                }
+            }))
+            return
+        }
+        res.end(JSON.stringify({
+            status: {
+                success: true
+            },
+            products: products
         }))
     })
 })
@@ -159,18 +134,7 @@ app.post('/api/club', function (req, res) {
 })
 
 
-/*
- * Attempt at server rendering. The general idea works, but observ is behaving
- * differently on node than in-browser, causing some issues.
- */
-var h = require('mercury').h
-var stringify = require('virtual-dom-stringify')
-var ClientApp = require('../client/scripts/app.js')
-app.get('/build-club', function (req, res) {
-    var state = ClientApp({
-        route: 'build-club'
-    })()
-
+function serverRenderRoute(state, req, res) {
     var vtree = h('html', {lang: 'en'}, [
         h('head', [
             h('meta', {charset: 'utf-8'}),
@@ -190,6 +154,35 @@ app.get('/build-club', function (req, res) {
 
     res.setHeader('Content-Type', 'text/html')
     res.end('<!DOCTYPE html>' + stringify(vtree))
+}
+
+
+/*
+ * Attempt at server rendering. The general idea works, but observ is behaving
+ * differently on node than in-browser, causing some issues.
+ */
+app.get('/build-club', function (req, res) {
+    var state = ClientApp({route: 'build-club'})()
+    serverRenderRoute(state, req, res)
+})
+
+
+/*
+ * Attempt at server rendering. The general idea works, but observ is behaving
+ * differently on node than in-browser, causing some issues.
+ */
+app.get('/club/:description/:startDate/:ASINs', function (req, res) {
+    var state = ClientApp({
+        route: 'club',
+        club: {
+            description: req.params.description,
+            products: [{
+                ASIN: 'B000HMB0IM'
+            }],
+            startDate: new Date(req.params.startDate)
+        }
+    })()
+    serverRenderRoute(state, req, res)
 })
 
 

@@ -9,9 +9,11 @@ var Club = require('./components/club.js'),
 
 
 //var ROOT_URI = String(document.location.pathname)
-var PRODUCTS_URI = 'products',
+var HOME_URI = '',
+    PRODUCTS_URI = 'products',
     BUILD_CLUB_URI = 'build-club',
-    CLUB_URI = 'club'
+    CLUB_URI = 'club',
+    ABOUT_URI = 'http://blog.crushingpennies.com/month-stuff-mercury'
 
 
 function App(initialState) {
@@ -25,13 +27,14 @@ function App(initialState) {
 
 
 function renderHeader(state) {
-    return h('header#header', [
+    return h('nav', [
         h('h1', 'Month Stuff'),
         h('h2', '... build your own gift of the month club.'),
-        /*h('ul', [
-            h('li', h('a', {src: '#'}, 'Item 1')),
-            h('li', h('a', {src: '#'}, 'Item 2'))
-        ])*/
+        h('ul', [
+            h('li', h('a', {href: HOME_URI}, 'Browse')),
+            h('li', h('a', {href: BUILD_CLUB_URI}, 'Build')),
+            h('li', h('a', {href: ABOUT_URI}, 'About'))
+        ])
     ])
 }
 
@@ -55,9 +58,11 @@ function renderRoute(state) {
             startDate = new Date(parts[2])
         }
         finally {
-            state.club.description.set(description)
+            // FIXME:
+            // This needs to happen at a higher level than the render process.
+            /*state.club.description.set(description)
             state.club.ASINs.set(ASINs)
-            state.club.startDate.set(startDate)
+            state.club.startDate.set(startDate)*/
             return Club.render(state.club)
         }
     }

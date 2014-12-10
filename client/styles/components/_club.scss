@@ -3,6 +3,7 @@
     vertical-align: top;
     padding: 1em;
     position: relative;
+    width: 550px;
     h1 {
         font-size: 120%;
     }
@@ -14,6 +15,7 @@
         font-size: 140%;
         font-weight: bold;
         border: solid 1px transparent;
+        display: inline-block;
         &:focus {
             border: solid 1px black;
         }
@@ -26,6 +28,22 @@
                 display: none;
                 width: 0;
                 height: 0;
+            }
+        }
+    }
+    .details {
+        position: relative;
+        margin-top: 10px;
+        .date {
+        }
+        .actions {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            a {
+                margin-left: 10px;
+                display: block;
+                text-align: right;
             }
         }
     }

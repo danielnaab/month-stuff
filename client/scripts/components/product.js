@@ -21,7 +21,7 @@ function Product(item) {
 }
 
 
-Product.render = function render(product, date) {
+Product.render = function render(product, date, clearCallback) {
     return h('div', [
         date ? h('.date', [
             h('span.month', date.toLocaleDateString(undefined, {month: 'long'})),
@@ -30,6 +30,9 @@ Product.render = function render(product, date) {
             ', ',
             h('span.year', date.toLocaleDateString(undefined, {year: 'numeric'}))
         ]) : null,
+        clearCallback ? h('.clear', {
+            'ev-click': hg.clickEvent(clearCallback, product)
+        }, 'Remove') : null,
         product.image ? h('img', {src: product.image.url,
                                   width: product.image.width,
                                   height: product.image.height}) : null,
