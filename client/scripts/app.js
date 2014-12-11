@@ -5,23 +5,24 @@ var hg = require('mercury'),
 
 var Club = require('./components/club.js'),
     ClubBuild = require('./components/club-build.js'),
-    Router = require('./lib/router'),
-    api = require('./api.js')
+    a = require('./lib/router/anchor'),
+    getRouter = require('./lib/router/getRouter')
 
 
 //var ROOT_URI = String(document.location.pathname)
-var HOME_URI = '',
-    PRODUCTS_URI = 'products',
-    BUILD_CLUB_URI = 'build-club',
-    CLUB_URI = 'club',
+var HOME_URI = '/',
+    PRODUCTS_URI = '/products',
+    BUILD_CLUB_URI = '/build-club',
+    CLUB_URI = '/club',
     ABOUT_URI = 'http://blog.crushingpennies.com/month-stuff-mercury'
 
 
-function App(initialState) {
+function App(initialState, serverRoute) {
     return hg.state({
         clubBuild: ClubBuild(initialState.clubBuild),
         club: Club(initialState.club),
-        route: initialState.route || Router(),
+        route: (serverRoute ? getRouter(serverRoute, false) :
+                              getRouter()),
         handles: {}
     })
 }
@@ -32,9 +33,9 @@ function renderHeader(state) {
         h('h1', 'Month Stuff'),
         h('h2', '... build your own gift of the month club.'),
         h('ul', [
-            h('li', h('a', {href: HOME_URI}, 'Browse')),
-            h('li', h('a', {href: BUILD_CLUB_URI}, 'Build')),
-            h('li', h('a', {href: ABOUT_URI}, 'About'))
+            h('li', a({href: HOME_URI}, 'Browse')),
+            h('li', a({href: BUILD_CLUB_URI}, 'Build')),
+            h('li', a({href: ABOUT_URI}, 'About'))
         ])
     ])
 }

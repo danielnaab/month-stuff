@@ -5,6 +5,7 @@ var h = hg.h
 var AutoCompleteInput = require('./autocomplete.js')
 var Product = require('./product.js')
 
+var a = require('../lib/router/anchor.js')
 var api = require('../api.js')
 
 
@@ -64,7 +65,7 @@ function Search(initial, selectProductCallback) {
 function renderPagination(state) {
     return state.totalPages > 1 ? h('ul.pagination', [
         state.page > 1 ? h('li',
-            h('a', {
+            a({
                 'ev-click': hg.clickEvent(state.handles.page, state.page - 1)
             }, '<')) : null,
         Array.apply(null, Array(state.totalPages)).map(function (_, page) {
@@ -76,7 +77,7 @@ function renderPagination(state) {
             )
         }),
         state.totalPages > state.page ? h('li',
-            h('a', {
+            a({
                 'ev-click': hg.clickEvent(state.handles.page, state.page + 1)
             }, '>')) : null,
     ]) : null

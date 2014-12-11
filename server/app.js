@@ -157,7 +157,8 @@ function serverRenderRoute(state, req, res) {
  * differently on node than in-browser, causing some issues.
  */
 app.get('/build-club', function (req, res) {
-    var state = ClientApp({route: 'build-club'})()
+    console.log('Serving /build-club')
+    var state = ClientApp({}, '/build-club')()
     serverRenderRoute(state, req, res)
 })
 
@@ -167,8 +168,8 @@ app.get('/build-club', function (req, res) {
  * differently on node than in-browser, causing some issues.
  */
 app.get('/club/:description/:startDate/:ASINs', function (req, res) {
+    console.log('Serving /club/:description/:startDate/:ASINs')
     var state = ClientApp({
-        route: 'club',
         club: {
             description: req.params.description,
             products: [{
@@ -176,7 +177,7 @@ app.get('/club/:description/:startDate/:ASINs', function (req, res) {
             }],
             startDate: new Date(req.params.startDate)
         }
-    })()
+    }, '/club')()
     serverRenderRoute(state, req, res)
 })
 

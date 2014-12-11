@@ -4,6 +4,7 @@ var document = require('global/document')
 var hg = require('mercury')
 var h = hg.h
 
+var a = require('../lib/router/anchor.js')
 var Product = require('./product.js')
 
 
@@ -101,8 +102,9 @@ Club.render = function render(state, editable) {
                 }),
             ]),
             h('.actions', [
-                state.products.length > 0 ? h('a.permalink', {
-                    href: Club.getPermalink(state)
+                state.products.length > 0 ? a({
+                    href: Club.getPermalink(state),
+                    className: 'permalink',
                 }, 'Subscribe to stuff club / Get permalink') : null,
                 editable ? h('a.clear', {
                     'ev-click': hg.clickEvent(state.handles.clearProducts)

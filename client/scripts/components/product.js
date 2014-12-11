@@ -24,15 +24,15 @@ function Product(item) {
 Product.render = function render(product, date, clearCB, upCB, downCB) {
     return h('div', [
         h('.actions', [
-            clearCB ? h('a.clear', {
-                'ev-click': hg.clickEvent(clearCB, product)
-            }, '✗') : null,
             upCB ? h('a.up', {
                     'ev-click': hg.clickEvent(upCB, product)
                 }, '▲') : null,
             downCB ? h('a.down', {
                     'ev-click': hg.clickEvent(downCB, product)
                 }, '▼') : null,
+            clearCB ? h('a.clear', {
+                'ev-click': hg.clickEvent(clearCB, product)
+            }, '✗') : null
         ]),
         date ? h('.date', [
             h('span.month', date.toLocaleDateString(undefined, {month: 'long'})),

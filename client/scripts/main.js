@@ -33,12 +33,21 @@ function getInitialState() {
 }
 
 
-function createApp() {
-    var app = App(getInitialState())
+function createApp(initialRoute) {
+    var app = App(getInitialState(), initialRoute)
 
     rafListen(app, function onChange(value) {
         window.localStorage.setItem(STATE_KEY, JSON.stringify(value))
     })
+
+    if (typeof app.route !== 'string') {
+        rafListen(app.route, function onChange(value) {
+            console.log('route changed')
+        })
+    }
+    else {
+        console.log(app.route)
+    }
 
     return app
 }
