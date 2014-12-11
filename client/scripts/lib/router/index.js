@@ -24,8 +24,8 @@ function popState() {
 function Router() {
     var inPopState = false
     var popStates = popState()
-    //var atom = hg.value(String(document.location.pathname))
-    var atom = hg.value(String(document.location.hash))
+    var atom = hg.value(String(document.location.pathname))
+    //var atom = hg.value(String(document.location.hash))
 
     popStates(function (uri) {
         inPopState = true

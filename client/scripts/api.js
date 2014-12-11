@@ -11,7 +11,8 @@ var config = require('./config.js')
 var ENDPOINTS = {
     autocomplete: 'http://completion.amazon.com/search/complete',
     club: config.API_ROOT + 'club',
-    search: config.API_ROOT + 'search'
+    search: config.API_ROOT + 'search',
+    products: config.API_ROOT + 'products'
 }
 
 
@@ -50,57 +51,56 @@ function search(keywords, page, callback) {
         json: true,
         response: true,
     }, function (error, response, body) {
-        if (error) {
-            console.log('Search error')
+        if (error || !body.status.success) {
+            callback(error || body.status.info || 'Search error')
+            return
         }
-        else {
-            callback(body.status, body.products, body.numPages)
-        }
+        callback(null, body.products, body.numPages)
     })
 }
 
 
-function saveClub(club, callback) {
+function getProducts(ASINs, callback) {
+    xhr({
+        method: 'GET',
+        url: ENDPOINTS.products + '/' + ASINs.join(','),
+        json: true,
+        response: true,
+    }, function (error, response, body) {
+        if (error || !body.status.success) {
+            callback(error || body.status.info || 'Error getting products')
+            return
+        }
+        callback(null, body.products)
+    })
+}
+
+
+function scheduleNotifications(club, emailAddress, callback) {
     xhr({
         method: 'POST',
         url: ENDPOINTS.club,
         json: {
             ASINs: club.ASINs,
             startDate: club.startDate,
-            description: club.description
+            description: club.description,
+            emailAddress: emailAddress
         },
         response: true,
     }, function (error, response, body) {
-        if (error || !(response.status && response.status.success)) {
-            console.log('Error saving club')
+        if (error || !body.status.success) {
+            callback(error || body.status.info ||
+                     'Unknown error scheduling email noftifications')
+            return
         }
-        else {
-            callback(response.clubId)
-        }
-    })
-}
-
-
-function getClub(clubId, callback) {
-    xhr({
-        method: 'GET',
-        url: ENDPOINTS.club + '/' + clubId,
-        json: true,
-        response: true,
-    }, function (error, response, body) {
-        if (error || !(response.status && response.status.success)) {
-            console.log('Error getting club')
-        }
-        else {
-            callback(response.clubId)
-        }
+        callback(null, body.products)
     })
 }
 
 
 module.exports = {
-    search: search,
     autocomplete: autocomplete,
-    saveClub: saveClub,
-    getClub: getClub
+    search: search,
+    getProducts: getProducts,
+    scheduleNotifications: scheduleNotifications
 }

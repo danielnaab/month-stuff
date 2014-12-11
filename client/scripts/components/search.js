@@ -12,8 +12,8 @@ function doSearch(state) {
     state.searching.set(true)
     api.search(state.keywords.text(),
                state.page(),
-               function (status, products, totalPages) {
-        if (status.success) {
+               function (err, products, totalPages) {
+        if (!err) {
             state.products.set(products)
             state.totalPages.set(totalPages)
         }
@@ -48,6 +48,11 @@ function Search(initial, selectProductCallback) {
         }
     })
 
+    // When keywords change, reset back to the first page.
+    state.keywords.text(function (keywords) {
+        state.page.set(1)
+    })
+
     state.searching(function (searching) {
         AutoCompleteInput.setEnabled(state.keywords, !searching)
     })
@@ -57,7 +62,7 @@ function Search(initial, selectProductCallback) {
 
 
 function renderPagination(state) {
-    return h('ul.pagination', [
+    return state.totalPages > 1 ? h('ul.pagination', [
         state.page > 1 ? h('li',
             h('a', {
                 'ev-click': hg.clickEvent(state.handles.page, state.page - 1)
@@ -74,7 +79,7 @@ function renderPagination(state) {
             h('a', {
                 'ev-click': hg.clickEvent(state.handles.page, state.page + 1)
             }, '>')) : null,
-    ])
+    ]) : null
 }
 
 

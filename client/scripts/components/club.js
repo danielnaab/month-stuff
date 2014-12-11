@@ -4,7 +4,6 @@ var document = require('global/document')
 var hg = require('mercury')
 var h = hg.h
 
-var DragList = require('./drag-list.js')
 var Product = require('./product.js')
 
 
@@ -15,11 +14,7 @@ function Club(initial) {
         initial.startDate = new Date(initial.startDate)
     }
 
-    if (initial.ASINs && !initial.products) {
-
-    }
-
-    return hg.state({
+    var state = hg.state({
         description: hg.value(initial.description || 'My Month Club'),
         ASINs: hg.array(initial.ASINs || []),
         products: hg.array(initial.products || []),
@@ -47,9 +42,21 @@ function Club(initial) {
                 if (index > -1) {
                     state.products.splice(index, 1)
                 }
+            },
+            moveProductUp: function (state, product) {
+                var index = state.products.indexOf(product)
+                state.products.splice(
+                    index - 1, 0, state.products.splice(index, 1)[0])
+            },
+            moveProductDown: function (state, product) {
+                var index = state.products.indexOf(product)
+                state.products.splice(
+                    index + 1, 0, state.products.splice(index, 1)[0])
             }
         }
     })
+
+    return state
 }
 
 
@@ -102,11 +109,16 @@ Club.render = function render(state, editable) {
                 }, 'Clear All') : null
             ]),
         ]),
-        DragList.render(state.products, 'products', function (product, index) {
-            return Product.render(product,
-                                  Club.getDateOffset(state.startDate, index),
-                                  state.handles.clearProduct)
-        })
+        h('ul.products', state.products.map(function (product, index) {
+            return h('li', Product.render(
+                product,
+                Club.getDateOffset(state.startDate, index),
+                editable ? state.handles.clearProduct : null,
+                editable && index > 0 ? state.handles.moveProductUp : null,
+                editable && index < state.products.length - 1 ?
+                    state.handles.moveProductDown : null)
+            )
+        }))
     ])
 }
 

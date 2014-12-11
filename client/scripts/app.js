@@ -5,7 +5,8 @@ var hg = require('mercury'),
 
 var Club = require('./components/club.js'),
     ClubBuild = require('./components/club-build.js'),
-    Router = require('./lib/router')
+    Router = require('./lib/router'),
+    api = require('./api.js')
 
 
 //var ROOT_URI = String(document.location.pathname)
@@ -58,11 +59,6 @@ function renderRoute(state) {
             startDate = new Date(parts[2])
         }
         finally {
-            // FIXME:
-            // This needs to happen at a higher level than the render process.
-            /*state.club.description.set(description)
-            state.club.ASINs.set(ASINs)
-            state.club.startDate.set(startDate)*/
             return Club.render(state.club)
         }
     }

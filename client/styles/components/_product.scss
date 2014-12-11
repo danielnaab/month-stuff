@@ -36,5 +36,21 @@ ul.products {
                 font-size: 150%;
             }
         }
+        .actions {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 4px;
+            a {
+                cursor: pointer;
+                text-decoration: none;
+                display: inline;
+                color: orange;
+                padding: 0 2px;
+                &:hover {
+                    color: darkorange;
+                }
+            }
+        }
     }
 }

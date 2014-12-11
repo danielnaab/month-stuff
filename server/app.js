@@ -6,16 +6,17 @@ var app = require('express')(),
     stringify = require('virtual-dom-stringify')
 
 var ClientApp = require('../client/scripts/app.js'),
-    amazon = require('./amazon.js'),
-    db = require('./db')
+    api = require('./api.js')
 
 
 var SEARCH_SCHEMA = {
     keywords: Joi.string().required(),
     page: Joi.number().integer().default(1)
 }
-var ADD_CLUB_SCHEMA = {
-    ASINs:  Joi.array().includes(Joi.string()).required()
+var SCHEDULE_STUFF_NOTIFICATIONS = {
+    ASINs:  Joi.array().includes(Joi.string()).required(),
+    description: Joi.string().required(),
+    startDate: Joi.date().required(),
 }
 var DEBUG = false
 
@@ -32,14 +33,9 @@ app.get('/api/search', function (req, res) {
         }))
         return
     }
-    var params = info.value
 
-    // Query Amazon's `ItemSearch` API.
-    var options = {
-        ItemPage: params.page,
-        Keywords: params.keywords
-    }
-    amazon.itemSearch(options, function (err, products, totalPages) {
+    var params = info.value
+    api.search(params.keywords, params.page, function (err, products, numPages) {
         if (err) {
             res.end(JSON.stringify({
                 status: {
@@ -49,26 +45,21 @@ app.get('/api/search', function (req, res) {
             }))
             return
         }
+
         res.end(JSON.stringify({
             status: {
                 success: true
             },
             products: products,
-            page: params.page,
-            // The API will only allow retreiving a maximum of 10 pages.
-            // If the "All" SearchIndex is used, it will only return 5 pages.
-            numPages: totalPages
+            numPages: numPages
         }))
     })
 })
 
 
 app.get('/api/products/:ASINs', function (req, res) {
-    // B00008OE6I,B35987036I,B0002546I
-
-    // Query Amazon's `ItemSearch` API.
     var ASINs = req.params.ASINs.split(',')
-    amazon.getItems(ASINs, function (err, products, totalPages) {
+    api.getProducts(ASINs, function (err, products) {
         if (err) {
             res.end(JSON.stringify({
                 status: {
@@ -88,7 +79,7 @@ app.get('/api/products/:ASINs', function (req, res) {
 })
 
 
-app.get('/api/club/:clubId', function (req, res) {
+/*app.get('/api/club/:clubId', function (req, res) {
     db.getClub(req.params.clubId, function (club) {
         if (!club) {
             res.status(404).end('Club not found')
@@ -102,12 +93,12 @@ app.get('/api/club/:clubId', function (req, res) {
             club: res.end(JSON.stringify(club))
         }))
     })
-})
+})*/
 
 
-app.post('/api/club', function (req, res) {
+app.post('/api/scheduleNotifications', function (req, res) {
     // Validate query parameters.
-    var info = Joi.validate(req.query, ADD_CLUB_SCHEMA)
+    var info = Joi.validate(req.query, SCHEDULE_STUFF_NOTIFICATIONS)
     if (info.error) {
         res.end(JSON.stringify({
             status: {
@@ -116,19 +107,23 @@ app.post('/api/club', function (req, res) {
         }))
         return
     }
-    var params = info.value
 
-    db.createClub(params.clubId, function (club) {
-        if (!club) {
-            res.status(404).end('Club not found')
+    var params = info.value
+    api.scheduleNotifications(params.ASINs, params.description, params.startDate,
+                              function (err) {
+        if (err) {
+            res.end(JSON.stringify({
+                status: {
+                    success: false,
+                    info: err
+                }
+            }))
             return
         }
-
         res.end(JSON.stringify({
             status: {
                 success: true
-            },
-            club: club
+            }
         }))
     })
 })
@@ -138,14 +133,14 @@ function serverRenderRoute(state, req, res) {
     var vtree = h('html', {lang: 'en'}, [
         h('head', [
             h('meta', {charset: 'utf-8'}),
-            h('title', 'Month Stuff')
-        ]),
-        h('body', [
+            h('title', 'Month Stuff'),
             h('link', {
                 href: 'http://localhost:9000/styles/app.css',
                 rel: 'stylesheet',
                 media: 'screen'
-            }),
+            })
+        ]),
+        h('body', [
             h('#app', ClientApp.render(state)),
             h('script', 'var initialState = ' + JSON.stringify(state)),
             h('script', {src: 'http://localhost:9000/scripts/main.js'})

@@ -21,8 +21,19 @@ function Product(item) {
 }
 
 
-Product.render = function render(product, date, clearCallback) {
+Product.render = function render(product, date, clearCB, upCB, downCB) {
     return h('div', [
+        h('.actions', [
+            clearCB ? h('a.clear', {
+                'ev-click': hg.clickEvent(clearCB, product)
+            }, '✗') : null,
+            upCB ? h('a.up', {
+                    'ev-click': hg.clickEvent(upCB, product)
+                }, '▲') : null,
+            downCB ? h('a.down', {
+                    'ev-click': hg.clickEvent(downCB, product)
+                }, '▼') : null,
+        ]),
         date ? h('.date', [
             h('span.month', date.toLocaleDateString(undefined, {month: 'long'})),
             ' ',
@@ -30,9 +41,6 @@ Product.render = function render(product, date, clearCallback) {
             ', ',
             h('span.year', date.toLocaleDateString(undefined, {year: 'numeric'}))
         ]) : null,
-        clearCallback ? h('.clear', {
-            'ev-click': hg.clickEvent(clearCallback, product)
-        }, 'Remove') : null,
         product.image ? h('img', {src: product.image.url,
                                   width: product.image.width,
                                   height: product.image.height}) : null,
